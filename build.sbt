@@ -13,10 +13,11 @@ lazy val root = (project in file("."))
   .settings(settings)
   .aggregate(
     core,
+    testEventLogGenerators,
   )
 
-lazy val core = project
-  .settings(
+lazy val core = {
+  project.settings(
     name := "core",
     settings,
     libraryDependencies ++= Seq(
@@ -27,6 +28,17 @@ lazy val core = project
       weaver % Test,
     ),
   )
+}
+
+lazy val testEventLogGenerators = {
+  Project(id = "testEventLogGenerators", base = file("test-event-log-generators")).settings(
+    settings,
+    libraryDependencies ++= Seq(
+      sparkCore,
+      sparkSql,
+    ),
+  )
+}
 
 lazy val settings = Seq(
   testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
