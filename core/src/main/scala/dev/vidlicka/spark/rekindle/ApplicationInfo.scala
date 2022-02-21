@@ -5,5 +5,5 @@ final case class ApplicationInfo(
     attemptId: String,
     name: String,
     start: Long,
-    eventLogMetada: EventLogMetadata,
+    eventLogMetadata: EventLogMetadata,
 )

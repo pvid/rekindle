@@ -1,36 +1,39 @@
 package dev.vidlicka.spark.rekindle
 
-import cats.implicits.*
 import cats.effect.*
+import cats.implicits.*
+import fs2.io.file.Path
 import weaver.*
 
 object EngineSmokeTest extends SimpleIOSuite {
-  val eventLog = getClass().getResource("/event-logs/simple.log").getPath()
+  val eventLogPath = getClass().getResource("/event-logs/simple.log").getPath
 
   test("smoke test") {
-    val source = FileEventLogSource[IO](Seq(eventLog))
+    val eventLog = FileEventLogSource.lineStream[IO](Path(eventLogPath))
 
-    source
-      .eventLogs
+    val outputStream = eventLog
       .through(
-        RekindleEngine(
+        RekindleEngine.process[IO](
           Replayers.combine(
             LogSizeReplayer(),
             SimpleSummaryReplayer(),
           ),
-          4,
+          EventLogMetadata("smoke-test"),
         ),
       )
-      .compile
-      .toList
-      .map { output =>
-        output
-          .collectFirst { case (_, Output.Metric("EventLogSize", count, _)) => count }
-          .fold {
+
+    TestHelpers
+      .withCollectedOutputsForSingleApp(outputStream) { case (_, outputs) =>
+        expect(outputs.size > 1) && {
+          outputs.collectFirst {
+            case Output.Metric("EventLogSize", count, _) =>
+              count
+          }.fold {
             failure("Did not found 'EventLogSize' event in output.")
           } { logSize =>
             expect(logSize > 0)
-          } && expect(output.size > 1)
+          }
+        }
       }
   }
 }

@@ -5,20 +5,24 @@ import fs2.Stream
 import fs2.io.file.{ Files, Path }
 
 /** Source that reads event logs from the local file system */
-class FileEventLogSource[F[_]: Async](paths: Seq[String]) extends EventLogSource[F] {
+class FileEventLogSource[F[_]: Async](paths: Seq[Path]) extends EventLogSource[F] {
+  import FileEventLogSource.*
 
   override def eventLogs: Stream[F, (EventLogMetadata, Stream[F, LogLine])] = {
     Stream
       .emits(paths)
       .map { path =>
-        val metadata = EventLogMetadata(path)
-        (metadata, singleStream(path))
+        val metadata = EventLogMetadata(path.toString)
+        (metadata, lineStream(path))
       }
   }
 
-  def singleStream(path: String): Stream[F, LogLine] = {
+}
+
+object FileEventLogSource {
+  def lineStream[F[_]: Async](path: Path): Stream[F, LogLine] = {
     Files[F]
-      .readAll(Path(path))
+      .readAll(path)
       .through(fs2.text.utf8.decode)
       .through(fs2.text.lines)
       .filter(_.nonEmpty)

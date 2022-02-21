@@ -24,9 +24,7 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
 
   import SimpleSummaryReplayer.State
 
-  override def apply(
-      eventLog: Stream[F, SparkListenerEvent],
-  ): Stream[F, Output] = {
+  override def apply(eventLog: Stream[F, SparkListenerEvent]): Stream[F, Output] = {
     eventLog
       .fold[State](State()) { case (state, event) =>
         event match {
