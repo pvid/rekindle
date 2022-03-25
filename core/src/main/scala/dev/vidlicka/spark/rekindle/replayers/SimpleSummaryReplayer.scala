@@ -7,6 +7,7 @@ import org.apache.spark.scheduler.{
   SparkListenerEvent,
   SparkListenerJobStart,
   SparkListenerStageSubmitted,
+  SparkListenerTaskEnd,
   SparkListenerTaskStart,
 }
 
@@ -17,6 +18,8 @@ object SimpleSummaryReplayer {
       var jobCount: Int = 0,
       var stageCount: Int = 0,
       var taskCount: Int = 0,
+      var totalTaskTime: Long = 0,
+      var totalGCTime: Long = 0,
   )
 }
 
@@ -40,6 +43,11 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
           case _: SparkListenerTaskStart =>
             state.taskCount += 1
 
+          case taskEnd: SparkListenerTaskEnd => {
+            state.totalTaskTime += taskEnd.taskInfo.duration
+            state.totalGCTime += taskEnd.taskMetrics.jvmGCTime
+          }
+
           case end: SparkListenerApplicationEnd =>
             state
               .appStart
@@ -58,6 +66,8 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
             Output.Metric("JobCount", state.jobCount.toLong),
             Output.Metric("StageCount", state.stageCount.toLong),
             Output.Metric("TaskCount", state.taskCount.toLong),
+            Output.Metric("TotalTaskTime", state.totalTaskTime),
+            Output.Metric("TotalGCTime", state.totalGCTime),
           ),
         )
       }
