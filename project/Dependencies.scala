@@ -6,6 +6,7 @@ object Dependencies {
   val sparkVersion = "3.2.0"
 
   val circe     = "io.circe"            %% "circe-core"      % circeVersion
+  val decline   = "com.monovore"        %% "decline-effect"  % "2.2.0"
   val fs2       = "co.fs2"              %% "fs2-core"        % fs2Version
   val fs2io     = "co.fs2"              %% "fs2-io"          % fs2Version
   val sparkCore = "org.apache.spark"     % "spark-core_2.13" % sparkVersion

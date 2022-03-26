@@ -11,15 +11,14 @@ object EngineSmokeTest extends SimpleIOSuite {
   test("smoke test") {
     val eventLog = FileEventLogSource.lineStream[IO](Path(eventLogPath))
 
-    val outputStream = eventLog
-      .through(
-        RekindleEngine.process[IO](
-          Replayers.combine(
-            LogSizeReplayer(),
-            SimpleSummaryReplayer(),
-          ),
-          EventLogMetadata("smoke-test"),
+    val outputStream =
+      RekindleEngine.process[IO](
+        Replayers.combine(
+          LogSizeReplayer(),
+          SimpleSummaryReplayer(),
         ),
+        EventLogMetadata("smoke-test"),
+        eventLog,
       )
 
     TestHelpers

@@ -17,28 +17,43 @@ lazy val root = (project in file("."))
   )
 
 lazy val core = {
-  project.settings(
-    name := "core",
-    settings,
-    libraryDependencies ++= Seq(
-      circe,
-      fs2,
-      fs2io,
-      sparkCore,
-      sparkSql,
-      weaver % Test,
-    ),
-  )
+  project
+    .settings(
+      name := "core",
+      settings,
+      libraryDependencies ++= Seq(
+        circe,
+        fs2,
+        fs2io,
+        sparkCore,
+        sparkSql,
+        weaver % Test,
+      ),
+    )
+}
+
+lazy val cli = {
+  project
+    .dependsOn(core)
+    .settings(
+      name := "cli",
+      settings,
+      libraryDependencies ++= Seq(
+        decline,
+      ),
+    )
+    .enablePlugins(JavaAppPackaging)
 }
 
 lazy val testEventLogGenerators = {
-  Project(id = "testEventLogGenerators", base = file("test-event-log-generators")).settings(
-    settings,
-    libraryDependencies ++= Seq(
-      sparkCore,
-      sparkSql,
-    ),
-  )
+  Project(id = "testEventLogGenerators", base = file("test-event-log-generators"))
+    .settings(
+      settings,
+      libraryDependencies ++= Seq(
+        sparkCore,
+        sparkSql,
+      ),
+    )
 }
 
 lazy val settings = Seq(

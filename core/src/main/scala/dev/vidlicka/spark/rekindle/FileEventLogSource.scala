@@ -8,12 +8,11 @@ import fs2.io.file.{ Files, Path }
 class FileEventLogSource[F[_]: Async](paths: Seq[Path]) extends EventLogSource[F] {
   import FileEventLogSource.*
 
-  override def eventLogs: Stream[F, (EventLogMetadata, Stream[F, LogLine])] = {
+  def eventLogs: Stream[F, (EventLogMetadata, Stream[F, LogLine])] = {
     Stream
       .emits(paths)
       .map { path =>
-        val metadata = EventLogMetadata(path.toString)
-        (metadata, lineStream(path))
+        (EventLogMetadata(path.toString), lineStream(path))
       }
   }
 
