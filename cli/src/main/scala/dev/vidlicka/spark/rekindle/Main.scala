@@ -31,7 +31,7 @@ object Main extends CommandIOApp(
 
         val replayer: Replayer[IO] = Replayers.combine(
           LogSizeReplayer(),
-          SimpleSummaryReplayer(),
+          SimpleSummaryEnhancer(SimpleSummaryReplayer()),
         )
 
         val outputHandler = StdoutJsonOutputHandler[IO]

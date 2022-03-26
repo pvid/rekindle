@@ -25,4 +25,11 @@ enum Output(name: String) derives Codec.AsObject {
       index: Long,
       value: Long,
   ) extends Output(name)
+
+  // Only derived metrics should be fractional, hence they need not be persisted
+  // including this for now because of derived metrics coming from CLI app
+  case FractionalMetric(
+      name: String,
+      value: Double,
+  ) extends Output(name)
 }

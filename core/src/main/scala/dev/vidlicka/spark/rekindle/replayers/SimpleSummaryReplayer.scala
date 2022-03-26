@@ -21,11 +21,20 @@ object SimpleSummaryReplayer {
       var totalTaskTime: Long = 0,
       var totalGCTime: Long = 0,
   )
+
+  object Metrics {
+    val Duration      = "Duration"
+    val JobCount      = "JobCount"
+    val StageCount    = "StageCount"
+    val TaskCount     = "TaskCount"
+    val TotalTaskTime = "TotalTaskTime"
+    val TotalGCTime   = "TotalGCTime"
+  }
 }
 
 class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
 
-  import SimpleSummaryReplayer.State
+  import SimpleSummaryReplayer.*
 
   def apply(eventLog: Stream[F, SparkListenerEvent]): Stream[F, Output] = {
     eventLog
@@ -61,13 +70,12 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
       .flatMap { state =>
         Stream.emits(
           Seq(
-            // TODO(pvid) pull out constants
-            Output.Metric("Duration", state.duration),
-            Output.Metric("JobCount", state.jobCount.toLong),
-            Output.Metric("StageCount", state.stageCount.toLong),
-            Output.Metric("TaskCount", state.taskCount.toLong),
-            Output.Metric("TotalTaskTime", state.totalTaskTime),
-            Output.Metric("TotalGCTime", state.totalGCTime),
+            Output.Metric(Metrics.Duration, state.duration),
+            Output.Metric(Metrics.JobCount, state.jobCount.toLong),
+            Output.Metric(Metrics.StageCount, state.stageCount.toLong),
+            Output.Metric(Metrics.TaskCount, state.taskCount.toLong),
+            Output.Metric(Metrics.TotalTaskTime, state.totalTaskTime),
+            Output.Metric(Metrics.TotalGCTime, state.totalGCTime),
           ),
         )
       }
