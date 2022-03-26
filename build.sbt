@@ -21,6 +21,7 @@ lazy val core = {
     name := "core",
     settings,
     libraryDependencies ++= Seq(
+      circe,
       fs2,
       fs2io,
       sparkCore,

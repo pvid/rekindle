@@ -1,28 +1,35 @@
 package dev.vidlicka.spark.rekindle
 
-sealed trait Output {
-  def name: String
-  def tags: List[String]
-}
+import dev.vidlicka.spark.rekindle.Output.*
+import io.circe.Codec
 
-/** Most of these are just experimental and no replayer that outputs them is implemented. They try
-  * to cover info/alert messages, metrics tracked across multiple app runs and single app metrics
-  */
-object Output {
-  val EmptyTags: List[String] = List.empty
+// Most of these are just experimental and no replayer that outputs them is implemented. They try
+// to cover info/alert messages, metrics tracked across multiple app runs and single app metrics
+// TODO(pvid) the JSON encoding uses wrapper class. Change to discriminator one https://github.com/circe/circe/pull/1800
+// is merged and published
+enum Output(name: String, tags: List[String]) derives Codec.AsObject {
+  case Message(
+      name: String,
+      contents: String,
+      tags: List[String] = EmptyTags,
+  ) extends Output(name, tags)
 
-  final case class Message(name: String, contents: String, tags: List[String] = EmptyTags)
-      extends Output
-
-  // summary metric, one value per application
-  final case class Metric(name: String, value: Long, tags: List[String] = EmptyTags) extends Output
+  case Metric(
+      name: String,
+      value: Long,
+      tags: List[String] = EmptyTags,
+  ) extends Output(name, tags)
 
   // can be indexed by timestamp, by stage, etc
   // even stage starts/ends could be encoded using this - index would be timestamp, value the stage number
-  final case class IndexedMetric(
+  case IndexedMetric(
       name: String,
       index: Long,
       value: Long,
       tags: List[String] = EmptyTags,
-  ) extends Output
+  ) extends Output(name, tags)
+}
+
+object Output {
+  val EmptyTags: List[String] = List.empty
 }
