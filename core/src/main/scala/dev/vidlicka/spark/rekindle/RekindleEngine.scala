@@ -10,11 +10,25 @@ import org.apache.spark.scheduler.{ SparkListenerApplicationStart, SparkListener
 object RekindleEngine {
   val LogLinesToBufferForAppInfo = 10
 
+  def asPipe[F[_]: Concurrent: MonadThrow](
+      replayer: Replayer[F],
+  ): Pipe[F, (EventLogMetadata, Stream[F, LogLine]), (ApplicationInfo, Stream[F, Output])] = {
+    _
+      .flatMap { case (metadata, eventLog) =>
+        RekindleEngine.process[F](
+          replayer,
+          metadata,
+          eventLog,
+        ),
+      }
+  }
+
   def process[F[_]: Concurrent: MonadThrow](
       replayer: Replayer[F],
       metadata: EventLogMetadata,
-  ): Pipe[F, LogLine, (ApplicationInfo, Stream[F, Output])] = { input =>
-    input
+      eventLog: Stream[F, LogLine],
+  ): Stream[F, (ApplicationInfo, Stream[F, Output])] = {
+    eventLog
       .through(parse)
       .through(parseAppInfo(metadata))
       .map { case (appInfo, eventStream) =>
