@@ -11,7 +11,7 @@ object EngineSmokeTest extends SimpleIOSuite {
   test("smoke test") {
     val eventLog = FileEventLogSource.lineStream[IO](Path(eventLogPath))
 
-    val outputStream =
+    val outputStream = {
       RekindleEngine.process[IO](
         Replayers.combine(
           LogSizeReplayer(),
@@ -20,12 +20,13 @@ object EngineSmokeTest extends SimpleIOSuite {
         EventLogMetadata("smoke-test"),
         eventLog,
       )
+    }
 
     TestHelpers
       .withCollectedOutputsForSingleApp(outputStream) { case (_, outputs) =>
         expect(outputs.size > 1) && {
           outputs.collectFirst {
-            case Output.Metric("EventLogSize", count, _) =>
+            case Output.Metric("EventLogSize", count) =>
               count
           }.fold {
             failure("Did not found 'EventLogSize' event in output.")

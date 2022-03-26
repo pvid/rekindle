@@ -7,18 +7,16 @@ import io.circe.Codec
 // to cover info/alert messages, metrics tracked across multiple app runs and single app metrics
 // TODO(pvid) the JSON encoding uses wrapper class. Change to discriminator one https://github.com/circe/circe/pull/1800
 // is merged and published
-enum Output(name: String, tags: List[String]) derives Codec.AsObject {
+enum Output(name: String) derives Codec.AsObject {
   case Message(
       name: String,
       contents: String,
-      tags: List[String] = EmptyTags,
-  ) extends Output(name, tags)
+  ) extends Output(name)
 
   case Metric(
       name: String,
       value: Long,
-      tags: List[String] = EmptyTags,
-  ) extends Output(name, tags)
+  ) extends Output(name)
 
   // can be indexed by timestamp, by stage, etc
   // even stage starts/ends could be encoded using this - index would be timestamp, value the stage number
@@ -26,10 +24,5 @@ enum Output(name: String, tags: List[String]) derives Codec.AsObject {
       name: String,
       index: Long,
       value: Long,
-      tags: List[String] = EmptyTags,
-  ) extends Output(name, tags)
-}
-
-object Output {
-  val EmptyTags: List[String] = List.empty
+  ) extends Output(name)
 }
