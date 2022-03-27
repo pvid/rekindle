@@ -45,6 +45,18 @@ lazy val cli = {
     .enablePlugins(JavaAppPackaging)
 }
 
+lazy val store = {
+  project
+    .dependsOn(core)
+    .settings(
+      name := "store",
+      settings,
+      libraryDependencies ++= Seq(
+        mapref
+      )
+    )
+}
+
 lazy val testEventLogGenerators = {
   Project(id = "testEventLogGenerators", base = file("test-event-log-generators"))
     .settings(

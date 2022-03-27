@@ -7,6 +7,7 @@ import io.circe.Codec
 // to cover info/alert messages, metrics tracked across multiple app runs and single app metrics
 // TODO(pvid) the JSON encoding uses wrapper class. Change to discriminator one https://github.com/circe/circe/pull/1800
 // is merged and published
+// TODO(pvid) maybe rename to something other than Output, since for storage and server part, it is very much not an output
 enum Output(name: String) derives Codec.AsObject {
   case Message(
       name: String,
