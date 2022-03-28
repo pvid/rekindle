@@ -9,7 +9,7 @@ object EngineSmokeTest extends SimpleIOSuite {
   val eventLogPath = getClass().getResource("/event-logs/simple.log").getPath
 
   test("smoke test") {
-    val eventLog = FileEventLogSource.lineStream[IO](Path(eventLogPath))
+    val eventLog = FileEventLogSource.lineStream[IO](Path(eventLogPath), false)
 
     val outputStream = {
       RekindleEngine.process[IO](

@@ -16,16 +16,17 @@ object Main extends CommandIOApp(
     ) {
   def main: Opts[IO[ExitCode]] = {
     val eventLogPaths: Opts[Option[NonEmptyList[Path]]] = Opts.arguments("PATH").orNone
+    val gzipped = Opts.flag("gzipped", "read input as gzip stream").orFalse
 
-    eventLogPaths
-      .map { inputPathOpt =>
+    (eventLogPaths, gzipped).tupled
+      .map { case (inputPathOpt, gzipped) =>
         val source: EventLogSource[IO] = {
           inputPathOpt
             .fold {
-              StdinEventLogSource[IO]
+              StdinEventLogSource[IO](gzipped)
             } { paths =>
               val fs2Paths = paths.map(fs2.io.file.Path.fromNioPath)
-              FileEventLogSource[IO](fs2Paths.toList)
+              FileEventLogSource[IO](fs2Paths.toList, gzipped)
             }
         }
 
