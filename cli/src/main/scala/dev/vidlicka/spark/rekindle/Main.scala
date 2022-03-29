@@ -15,13 +15,25 @@ object Main extends CommandIOApp(
       header = "Showcase CLI app for the Rekindle toolkit",
     ) {
   def main: Opts[IO[ExitCode]] = {
-    val eventLogPaths: Opts[Option[NonEmptyList[Path]]] = Opts.arguments("PATH").orNone
+    val eventLogPaths = Opts.arguments[Path]("PATH").orNone
+
+    val parallelism = {
+      Opts.option[Int](
+        "parallelism",
+        help = "number of event logs processed in parallel",
+      ).withDefault(4)
+    }
+
     val gzipped = Opts.flag("gzipped", "read input as gzip stream").orFalse
 
-    (eventLogPaths, gzipped).tupled
-      .map { case (inputPathOpt, gzipped) =>
+    (
+      eventLogPaths,
+      parallelism,
+      gzipped,
+    ).tupled
+      .map { case (eventLogPaths, parallelism, gzipped) =>
         val source: EventLogSource[IO] = {
-          inputPathOpt
+          eventLogPaths
             .fold {
               StdinEventLogSource[IO](gzipped)
             } { paths =>
@@ -39,8 +51,17 @@ object Main extends CommandIOApp(
 
         source
           .eventLogs
-          .through(RekindleEngine.asPipe[IO](replayer))
-          .through(outputHandler)
+          .parEvalMapUnordered(parallelism) {
+            case (metadata, eventLog) =>
+              RekindleEngine.process[IO](
+                replayer,
+                metadata,
+                eventLog,
+              )
+                .through(outputHandler)
+                .compile
+                .drain
+          }
           .compile
           .drain
           .as(ExitCode.Success)
