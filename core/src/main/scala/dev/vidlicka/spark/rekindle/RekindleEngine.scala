@@ -12,7 +12,7 @@ object RekindleEngine {
 
   def asPipe[F[_]: Concurrent: MonadThrow](
       replayer: Replayer[F],
-  ): Pipe[F, (EventLogMetadata, Stream[F, LogLine]), (ApplicationInfo, Stream[F, Output])] = {
+  ): Pipe[F, (EventLogMetadata, Stream[F, LogLine]), (ApplicationInfo, Stream[F, Observation])] = {
     _
       .flatMap { case (metadata, eventLog) =>
         RekindleEngine.process[F](
@@ -27,7 +27,7 @@ object RekindleEngine {
       replayer: Replayer[F],
       metadata: EventLogMetadata,
       eventLog: Stream[F, LogLine],
-  ): Stream[F, (ApplicationInfo, Stream[F, Output])] = {
+  ): Stream[F, (ApplicationInfo, Stream[F, Observation])] = {
     eventLog
       .through(parse)
       .through(parseAppInfo(metadata))
@@ -36,7 +36,7 @@ object RekindleEngine {
           .through(replayer)
           .handleErrorWith { error =>
             // TODO(pvid) pull out constant
-            Stream.emit(Output.Message("ReplayFailed", s"Replay failed with error: $error"))
+            Stream.emit(Observation.Message("ReplayFailed", s"Replay failed with error: $error"))
           }
 
         (appInfo, outputs)

@@ -8,4 +8,4 @@ import fs2.{ Pipe, Stream }
   *   - push to Slack / send emails
   *   - emit to Kafka
   */
-type OutputHandler[F[_]] = Pipe[F, (ApplicationInfo, Stream[F, Output]), Unit]
+type OutputHandler[F[_]] = Pipe[F, (ApplicationInfo, Stream[F, Observation]), Unit]

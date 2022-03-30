@@ -23,10 +23,10 @@ object EngineSmokeTest extends SimpleIOSuite {
     }
 
     TestHelpers
-      .withCollectedOutputsForSingleApp(outputStream) { case (_, outputs) =>
-        expect(outputs.size > 1) && {
-          outputs.collectFirst {
-            case Output.Metric("EventLogSize", count) =>
+      .withCollectedObservationsForSingleApp(outputStream) { case (_, observations) =>
+        expect(observations.size > 1) && {
+          observations.collectFirst {
+            case Observation.Metric("EventLogSize", count) =>
               count
           }.fold {
             failure("Did not found 'EventLogSize' event in output.")

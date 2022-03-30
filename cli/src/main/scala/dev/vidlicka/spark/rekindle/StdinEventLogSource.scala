@@ -1,8 +1,8 @@
 package dev.vidlicka.spark.rekindle
 
 import cats.effect.*
-import fs2.{ Pipe, Stream }
 import fs2.compression.Compression
+import fs2.{ Pipe, Stream }
 
 class StdinEventLogSource[F[_]: Sync](gzipped: Boolean) extends EventLogSource[F] {
   import StdinEventLogSource.*

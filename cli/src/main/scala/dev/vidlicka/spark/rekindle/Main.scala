@@ -44,7 +44,7 @@ object Main extends CommandIOApp(
 
         val replayer: Replayer[IO] = Replayers.combine(
           LogSizeReplayer(),
-          SimpleSummaryEnhancer(SimpleSummaryReplayer()),
+          SimpleSummaryReplayer(),
         )
 
         val outputHandler = StdoutJsonOutputHandler[IO]
@@ -58,6 +58,9 @@ object Main extends CommandIOApp(
                 metadata,
                 eventLog,
               )
+                .map { case (appInfo, observations) =>
+                  (appInfo, observations.through(SimpleSummaryEnhancer()))
+                }
                 .through(outputHandler)
                 .compile
                 .drain

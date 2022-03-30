@@ -7,31 +7,31 @@ import weaver.Expectations
 import weaver.Expectations.Helpers.*
 
 object TestHelpers {
-  def collectOutputs[F[_]: Concurrent](
-      outputs: Stream[F, (ApplicationInfo, Stream[F, Output])],
-  ): F[List[(ApplicationInfo, List[Output])]] = {
+  def collectObservations[F[_]: Concurrent](
+      outputs: Stream[F, (ApplicationInfo, Stream[F, Observation])],
+  ): F[List[(ApplicationInfo, List[Observation])]] = {
     outputs
       .evalMap { case (appInfo, outputs) => outputs.compile.toList.map((appInfo, _)) }
       .compile
       .toList
   }
 
-  def withCollectedOutputs[F[_]: Concurrent](
-      outputs: Stream[F, (ApplicationInfo, Stream[F, Output])],
+  def withCollectedObservations[F[_]: Concurrent](
+      outputs: Stream[F, (ApplicationInfo, Stream[F, Observation])],
   )(
-      test: List[(ApplicationInfo, List[Output])] => Expectations,
+      test: List[(ApplicationInfo, List[Observation])] => Expectations,
   ): F[Expectations] = {
-    collectOutputs(outputs).map(test)
+    collectObservations(outputs).map(test)
   }
 
-  def withCollectedOutputsForSingleApp[F[_]: Concurrent](
-      outputs: Stream[F, (ApplicationInfo, Stream[F, Output])],
+  def withCollectedObservationsForSingleApp[F[_]: Concurrent](
+      outputs: Stream[F, (ApplicationInfo, Stream[F, Observation])],
   )(
-      test: ((ApplicationInfo, List[Output])) => Expectations,
+      test: ((ApplicationInfo, List[Observation])) => Expectations,
   ): F[Expectations] = {
-    collectOutputs(outputs)
+    collectObservations(outputs)
       .map {
-        case Nil         => failure("Output is empty!")
+        case Nil         => failure("Observation is empty!")
         case head :: Nil => test(head)
         case _           => failure("Stream contains outputs for more than a single event log!")
       }

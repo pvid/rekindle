@@ -36,7 +36,7 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
 
   import SimpleSummaryReplayer.*
 
-  def apply(eventLog: Stream[F, SparkListenerEvent]): Stream[F, Output] = {
+  def apply(eventLog: Stream[F, SparkListenerEvent]): Stream[F, Observation] = {
     eventLog
       .fold[State](State()) { case (state, event) =>
         event match {
@@ -70,12 +70,12 @@ class SimpleSummaryReplayer[F[_]] extends Replayer[F] {
       .flatMap { state =>
         Stream.emits(
           Seq(
-            Output.Metric(Metrics.Duration, state.duration),
-            Output.Metric(Metrics.JobCount, state.jobCount.toLong),
-            Output.Metric(Metrics.StageCount, state.stageCount.toLong),
-            Output.Metric(Metrics.TaskCount, state.taskCount.toLong),
-            Output.Metric(Metrics.TotalTaskTime, state.totalTaskTime),
-            Output.Metric(Metrics.TotalGCTime, state.totalGCTime),
+            Observation.Metric(Metrics.Duration, state.duration),
+            Observation.Metric(Metrics.JobCount, state.jobCount.toLong),
+            Observation.Metric(Metrics.StageCount, state.stageCount.toLong),
+            Observation.Metric(Metrics.TaskCount, state.taskCount.toLong),
+            Observation.Metric(Metrics.TotalTaskTime, state.totalTaskTime),
+            Observation.Metric(Metrics.TotalGCTime, state.totalGCTime),
           ),
         )
       }

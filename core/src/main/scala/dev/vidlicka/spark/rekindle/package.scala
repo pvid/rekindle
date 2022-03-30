@@ -10,7 +10,5 @@ package object rekindle {
     * primitives (producing intermediate values, evaluating rules) that can be composed into a
     * single Replayer
     */
-  type Replayer[F[_]] = Pipe[F, SparkListenerEvent, Output]
-
-  val event: SparkListenerApplicationStart = ???
+  type Replayer[F[_]] = Pipe[F, SparkListenerEvent, Observation]
 }
