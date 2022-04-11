@@ -13,6 +13,7 @@ lazy val root = (project in file("."))
   .settings(settings)
   .aggregate(
     core,
+    cli,
     testEventLogGenerators,
   )
 
@@ -23,6 +24,8 @@ lazy val core = {
       settings,
       libraryDependencies ++= Seq(
         circe,
+        circeGeneric,
+        circeParser,
         fs2,
         fs2io,
         sparkCore,

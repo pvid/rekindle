@@ -2,9 +2,10 @@ package dev.vidlicka.spark.rekindle
 
 import cats.effect.*
 import cats.implicits.*
-import dev.vidlicka.spark.rekindle.SimpleSummaryReplayer.Metrics
 import fs2.{ Pipe, Stream }
 import org.apache.spark.scheduler.SparkListenerEvent
+
+import dev.vidlicka.spark.rekindle.SimpleSummaryReplayer.Metrics
 
 /** Enhance outputs coming from SimpleSummaryReplayer by a few derived metrics
   *
