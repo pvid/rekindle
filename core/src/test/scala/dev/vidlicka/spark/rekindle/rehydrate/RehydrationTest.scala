@@ -3,10 +3,11 @@ package dev.vidlicka.spark.rekindle.rehydrate
 import cats.effect.*
 import cats.implicits.*
 import fs2.Stream
-import fs2.io.file.{Files, Path}
+import fs2.io.file.{ Files, Path }
 import weaver.*
 
 import dev.vidlicka.spark.rekindle.*
+import dev.vidlicka.spark.rekindle.replayers.*
 
 object RehydrationTest extends SimpleIOSuite {
   val eventLogPath = getClass().getResource("/event-logs/simple.log").getPath
@@ -17,8 +18,7 @@ object RehydrationTest extends SimpleIOSuite {
     val outputStream = {
       RekindleEngine.process[IO](
         Replayers.combine(
-          LogSizeReplayer(),
-          SimpleSummaryReplayer(),
+          canonicalReplayers *,
         ),
         EventLogMetadata("smoke-test"),
         eventLog,
@@ -28,7 +28,7 @@ object RehydrationTest extends SimpleIOSuite {
     Files[IO]
       .tempDirectory
       .use { dir =>
-        val dir = Path("/Users/pavol/git/rekindle/testdir")
+        val dir = Path("./testdir")
         for {
           _          <- ObservationsRehydrator.dehydrate(1, dir, outputStream)
           dehydrated <- buffer(ObservationsRehydrator.rehydrate(dir))

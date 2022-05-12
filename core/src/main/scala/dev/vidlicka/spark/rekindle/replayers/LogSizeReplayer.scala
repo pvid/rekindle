@@ -1,7 +1,9 @@
-package dev.vidlicka.spark.rekindle
+package dev.vidlicka.spark.rekindle.replayers
 
 import fs2.Stream
 import org.apache.spark.scheduler.SparkListenerEvent
+
+import dev.vidlicka.spark.rekindle.*
 
 class LogSizeReplayer[F[_]] extends Replayer[F] {
 

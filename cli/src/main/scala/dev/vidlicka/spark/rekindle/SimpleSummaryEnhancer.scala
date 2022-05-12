@@ -5,7 +5,7 @@ import cats.implicits.*
 import fs2.{ Pipe, Stream }
 import org.apache.spark.scheduler.SparkListenerEvent
 
-import dev.vidlicka.spark.rekindle.SimpleSummaryReplayer.Metrics
+import dev.vidlicka.spark.rekindle.replayers.SimpleSummaryReplayer.Metrics
 
 /** Enhance outputs coming from SimpleSummaryReplayer by a few derived metrics
   *
@@ -43,7 +43,7 @@ class SimpleSummaryEnhancer[F[_]: Concurrent] extends Pipe[F, Observation, Gener
         taskTime <- valuesMap.get(Metrics.TotalTaskTime)
         gcTime   <- valuesMap.get(Metrics.TotalGCTime)
       } yield {
-        DerivedObservation.FractionalMetric("GCRatio", gcTime.toDouble / taskTime)
+        GeneralObservation.FractionalMetric("GCRatio", gcTime.toDouble / taskTime)
       }
     }
 
@@ -52,7 +52,7 @@ class SimpleSummaryEnhancer[F[_]: Concurrent] extends Pipe[F, Observation, Gener
         taskTime <- valuesMap.get(Metrics.TotalTaskTime)
         duration <- valuesMap.get(Metrics.Duration)
       } yield {
-        DerivedObservation.FractionalMetric("EffectiveParallelism", taskTime.toDouble / duration)
+        GeneralObservation.FractionalMetric("EffectiveParallelism", taskTime.toDouble / duration)
       }
     }
 

@@ -1,4 +1,4 @@
-package dev.vidlicka.spark.rekindle
+package dev.vidlicka.spark.rekindle.replayers
 
 import fs2.Stream
 import org.apache.spark.scheduler.{
@@ -10,6 +10,8 @@ import org.apache.spark.scheduler.{
   SparkListenerTaskEnd,
   SparkListenerTaskStart,
 }
+
+import dev.vidlicka.spark.rekindle.*
 
 object SimpleSummaryReplayer {
   final private case class State(

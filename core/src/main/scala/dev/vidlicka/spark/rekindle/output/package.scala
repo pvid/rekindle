@@ -1,10 +1,10 @@
 package dev.vidlicka.spark.rekindle.output
 
 import fs2.{ Pipe, Stream }
+import io.circe.Codec
 import io.circe.syntax.*
 
 import dev.vidlicka.spark.rekindle.*
-import io.circe.Codec
 
 class StreamingJsonEncoder[F[_]]
     extends Pipe[F, (ApplicationInfo, Stream[F, GeneralObservation]), Byte] {

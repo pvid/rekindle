@@ -5,6 +5,8 @@ import cats.implicits.*
 import fs2.io.file.Path
 import weaver.*
 
+import dev.vidlicka.spark.rekindle.replayers.*
+
 object EngineSmokeTest extends SimpleIOSuite {
   val eventLogPath = getClass().getResource("/event-logs/simple.log").getPath
 
@@ -14,8 +16,7 @@ object EngineSmokeTest extends SimpleIOSuite {
     val outputStream = {
       RekindleEngine.process[IO](
         Replayers.combine(
-          LogSizeReplayer(),
-          SimpleSummaryReplayer(),
+          canonicalReplayers *,
         ),
         EventLogMetadata("smoke-test"),
         eventLog,

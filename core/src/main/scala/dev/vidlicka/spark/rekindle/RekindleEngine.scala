@@ -32,12 +32,14 @@ object RekindleEngine {
       .through(parse)
       .through(parseAppInfo(metadata))
       .map { case (appInfo, eventStream) =>
-        val outputs = eventStream
-          .through(replayer)
-          .handleErrorWith { error =>
-            // TODO(pvid) pull out constant
-            Stream.emit(Observation.Message("ReplayFailed", s"Replay failed with error: $error"))
-          }
+        val outputs = {
+          eventStream
+            .through(replayer)
+            .handleErrorWith { error =>
+              // TODO(pvid) pull out constant
+              Stream.emit(Observation.Message("ReplayFailed", s"Replay failed with error: $error"))
+            }
+        }
 
         (appInfo, outputs)
       }

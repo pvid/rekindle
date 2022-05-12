@@ -10,6 +10,8 @@ import cats.implicits.*
 import com.monovore.decline.*
 import com.monovore.decline.effect.*
 
+import dev.vidlicka.spark.rekindle.replayers.*
+
 object Main extends CommandIOApp(
       name = "rekindle",
       header = "Showcase CLI app for the Rekindle toolkit",
@@ -43,8 +45,7 @@ object Main extends CommandIOApp(
         }
 
         val replayer: Replayer[IO] = Replayers.combine(
-          LogSizeReplayer(),
-          SimpleSummaryReplayer(),
+          canonicalReplayers *,
         )
 
         val outputHandler = StdoutJsonOutputHandler[IO]

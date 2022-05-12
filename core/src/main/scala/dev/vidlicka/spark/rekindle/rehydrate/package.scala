@@ -5,7 +5,7 @@ import cats.effect.*
 import cats.effect.implicits.*
 import cats.implicits.*
 import fs2.compression.Compression
-import fs2.io.file.{Files, Path}
+import fs2.io.file.{ Files, Path }
 import fs2.{ Pipe, Stream }
 import io.circe.parser.*
 import io.circe.syntax.*

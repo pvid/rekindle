@@ -14,6 +14,7 @@ lazy val root = (project in file("."))
   .aggregate(
     core,
     cli,
+    store,
     testEventLogGenerators,
   )
 
@@ -55,8 +56,12 @@ lazy val store = {
       name := "store",
       settings,
       libraryDependencies ++= Seq(
-        mapref
-      )
+        doobie,
+        doobieHikari,
+        h2,
+        mapref,
+        weaver % Test,
+      ),
     )
 }
 
